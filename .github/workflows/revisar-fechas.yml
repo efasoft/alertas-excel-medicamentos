@@ -1,0 +1,51 @@
+name: Revisar Fechas Excel y Enviar Alertas
+
+on:
+  schedule:
+    # Ejecutar todos los días a las 08:30 UTC (ajusta según tu zona horaria)
+    # Para Colombia/Perú (UTC-5): 08:30 UTC = 03:30 hora local
+    # Para México (UTC-6): 08:30 UTC = 02:30 hora local
+    # Para España (UTC+1): 08:30 UTC = 09:30 hora local
+    - cron: '30 8 * * *'
+  
+  # Permite ejecutar manualmente desde la interfaz de GitHub
+  workflow_dispatch:
+
+jobs:
+  revisar-fechas:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+    
+    - name: Configurar Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install openpyxl gdown
+    
+    - name: Descargar Excel desde Google Drive
+      env:
+        GDRIVE_FILE_ID: ${{ secrets.GDRIVE_FILE_ID }}
+      run: |
+        echo "Descargando archivo Excel desde Google Drive..."
+        gdown --id $GDRIVE_FILE_ID -O medicamentos.xlsx
+    
+    - name: Ejecutar script de revisión
+      env:
+        GMAIL_USUARIO: ${{ secrets.GMAIL_USUARIO }}
+        GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+        EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+      run: |
+        echo "Ejecutando revisión de fechas..."
+        python revisar_fechas.py
+    
+    - name: Resultado
+      if: always()
+      run: |
+        echo "Proceso completado - Revisa los logs arriba"
