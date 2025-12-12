@@ -22,7 +22,7 @@ EMAIL_DESTINO = os.environ.get('EMAIL_DESTINO')
 RUTA_EXCEL = "medicamentos.xlsx"
 
 # Configuración de revisión
-COLUMNAS_REVISAR = ['I', 'J', 'K', 'L', 'M', 'N', 'O']
+COLUMNAS_REVISAR = ['I']
 DIAS_ALERTA = 3
 
 def log(mensaje):
