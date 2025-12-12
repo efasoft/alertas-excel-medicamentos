@@ -6,7 +6,7 @@ on:
     # Para Colombia/Perú (UTC-5): 08:30 UTC = 03:30 hora local
     # Para México (UTC-6): 08:30 UTC = 02:30 hora local
     # Para España (UTC+1): 08:30 UTC = 09:30 hora local
-    - cron: '30 8 * * *'
+    - cron: '30 7 * * *'
   
   # Permite ejecutar manualmente desde la interfaz de GitHub
   workflow_dispatch:
