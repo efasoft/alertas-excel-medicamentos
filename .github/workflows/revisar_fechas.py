@@ -14,9 +14,9 @@ import os
 import sys
 
 # Obtener configuración desde variables de entorno (GitHub Secrets)
-GMAIL_USUARIO = "efasoftt@gmail.com"
-GMAIL_PASSWORD = "becwcnkgqlomjgcv"  # Tu contraseña de aplicación de Gmail
-EMAIL_DESTINO = "efasoft@hotmail.com"
+GMAIL_USUARIO = os.environ.get('GMAIL_USUARIO')
+GMAIL_PASSWORD = os.environ.get('GMAIL_PASSWORD')
+EMAIL_DESTINO = os.environ.get('EMAIL_DESTINO')
 
 # Archivo Excel (se descarga automáticamente desde Google Drive)
 RUTA_EXCEL = "medicamentos.xlsx"
