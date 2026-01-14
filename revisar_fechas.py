@@ -26,7 +26,7 @@ RUTA_EXCEL = "medicamentos.xlsx"
 
 # Configuración
 COLUMNAS_REVISAR = ['I', 'J', 'K', 'L', 'M', 'N', 'O']
-DIAS_ALERTA = 3
+DIAS_ALERTA = 4
 FILA_INICIO = 14  # Empezar desde la fila 14
 
 def log(mensaje):
