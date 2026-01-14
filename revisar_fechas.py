@@ -25,8 +25,8 @@ WHATSAPP_API_KEY = os.environ.get('WHATSAPP_API_KEY', '')  # API de CallMeBot (g
 RUTA_EXCEL = "medicamentos.xlsx"
 
 # Configuración
-COLUMNAS_REVISAR = ['I', 'J', 'K', 'L', 'M', 'N', 'O']
-DIAS_ALERTA = 6
+COLUMNAS_REVISAR = ['I']
+DIAS_ALERTA = 5
 FILA_INICIO = 14  # Empezar desde la fila 14
 
 def log(mensaje):
