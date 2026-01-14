@@ -26,7 +26,7 @@ RUTA_EXCEL = "medicamentos.xlsx"
 
 # Configuración
 COLUMNAS_REVISAR = ['I', 'J', 'K', 'L', 'M', 'N', 'O']
-DIAS_ALERTA = 5
+DIAS_ALERTA = 6
 FILA_INICIO = 14  # Empezar desde la fila 14
 
 def log(mensaje):
@@ -88,7 +88,7 @@ def leer_excel_y_buscar_alertas(ruta_archivo):
                     fecha_celda = valor.date()
                     dias_restantes = (fecha_celda - fecha_hoy).days
                     
-                    if 0 <= dias_restantes < DIAS_ALERTA:
+                    if 0 <= dias_restantes <= DIAS_ALERTA:
                         col_letra = openpyxl.utils.cell.get_column_letter(col_num)
                         
                         # Obtener nombre del medicamento (columna A)
