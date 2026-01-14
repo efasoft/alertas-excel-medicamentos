@@ -140,10 +140,14 @@ def crear_html_email_bootstrap(alertas, info_paciente):
     <title>Alertas de Medicamentos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        * {{
+            box-sizing: border-box;
+        }}
         body {{
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
+            padding: 10px;
+            margin: 0;
         }}
         .container-email {{
             max-width: 800px;
@@ -156,70 +160,77 @@ def crear_html_email_bootstrap(alertas, info_paciente):
         .header {{
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px 30px;
+            padding: 30px 20px;
             text-align: center;
         }}
         .header h1 {{
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: bold;
+            line-height: 1.3;
         }}
         .header .subtitle {{
-            margin-top: 10px;
-            font-size: 1.1rem;
+            margin-top: 8px;
+            font-size: 0.95rem;
             opacity: 0.9;
         }}
         .info-paciente {{
             background: #f8f9fa;
-            padding: 25px 30px;
+            padding: 20px 15px;
             border-left: 5px solid #667eea;
-            margin: 30px;
+            margin: 20px 15px;
             border-radius: 10px;
         }}
         .info-paciente h3 {{
             color: #667eea;
-            margin: 0 0 15px 0;
-            font-size: 1.3rem;
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
         }}
         .info-item {{
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 1.05rem;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }}
         .info-label {{
             font-weight: bold;
             color: #495057;
-            margin-right: 10px;
-            min-width: 100px;
+            display: block;
+            margin-bottom: 3px;
+        }}
+        .info-value {{
+            display: block;
+            padding-left: 5px;
         }}
         .alert-summary {{
             text-align: center;
-            padding: 30px;
+            padding: 20px 15px;
             background: #fff3cd;
             border-left: 5px solid #ffc107;
-            margin: 30px;
+            margin: 20px 15px;
             border-radius: 10px;
         }}
         .alert-summary h2 {{
             color: #856404;
             margin: 0;
-            font-size: 2rem;
+            font-size: 1.5rem;
+            line-height: 1.3;
         }}
         .alert-summary p {{
-            margin: 10px 0 0 0;
+            margin: 8px 0 0 0;
             color: #856404;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }}
         .medicamentos-container {{
-            padding: 30px;
+            padding: 20px 15px;
         }}
         .section-title {{
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
             border-bottom: 3px solid;
+            line-height: 1.3;
         }}
         .section-hoy .section-title {{
             color: #dc3545;
@@ -235,16 +246,11 @@ def crear_html_email_bootstrap(alertas, info_paciente):
         }}
         .medicamento-card {{
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             border-left: 5px solid;
-        }}
-        .medicamento-card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }}
         .card-hoy {{
             border-color: #dc3545;
@@ -259,35 +265,41 @@ def crear_html_email_bootstrap(alertas, info_paciente):
             background: linear-gradient(to right, #fffde7, white);
         }}
         .medicamento-nombre {{
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #212529;
+            line-height: 1.3;
+            word-wrap: break-word;
         }}
         .medicamento-uso {{
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #6c757d;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-style: italic;
+            line-height: 1.4;
         }}
         .medicamento-info {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            display: block;
         }}
         .fecha-revision {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1rem;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #495057;
+        }}
+        .fecha-revision strong {{
+            display: inline-block;
+            margin-right: 5px;
         }}
         .badge-dias {{
-            font-size: 1.2rem;
-            padding: 10px 20px;
+            display: inline-block;
+            font-size: 0.85rem;
+            padding: 6px 12px;
             border-radius: 50px;
             font-weight: bold;
+            margin-top: 5px;
+            text-align: center;
         }}
         .badge-hoy {{
             background: #dc3545;
@@ -303,25 +315,61 @@ def crear_html_email_bootstrap(alertas, info_paciente):
         }}
         .footer {{
             background: #f8f9fa;
-            padding: 30px;
+            padding: 20px 15px;
             text-align: center;
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }}
         .footer hr {{
-            margin: 20px 0;
+            margin: 15px 0;
             border-color: #dee2e6;
         }}
-        @media (max-width: 600px) {{
+        .footer p {{
+            margin: 8px 0;
+            line-height: 1.5;
+        }}
+        
+        /* Media queries para pantallas muy pequeñas */
+        @media (max-width: 480px) {{
+            body {{
+                padding: 5px;
+            }}
+            .header {{
+                padding: 20px 15px;
+            }}
             .header h1 {{
-                font-size: 1.8rem;
+                font-size: 1.5rem;
+            }}
+            .header .subtitle {{
+                font-size: 0.85rem;
+            }}
+            .info-paciente,
+            .alert-summary,
+            .medicamentos-container {{
+                margin: 15px 10px;
+                padding: 15px 12px;
+            }}
+            .medicamento-card {{
+                padding: 12px;
             }}
             .medicamento-nombre {{
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }}
-            .medicamento-info {{
-                flex-direction: column;
-                align-items: flex-start;
+            .section-title {{
+                font-size: 1.1rem;
+            }}
+            .alert-summary h2 {{
+                font-size: 1.3rem;
+            }}
+        }}
+        
+        /* Para clientes de email (Gmail, Outlook) */
+        @media screen and (max-width: 600px) {{
+            .container-email {{
+                border-radius: 10px !important;
+            }}
+            table {{
+                width: 100% !important;
             }}
         }}
     </style>
@@ -339,11 +387,11 @@ def crear_html_email_bootstrap(alertas, info_paciente):
             <h3>📋 Información del Paciente</h3>
             <div class="info-item">
                 <span class="info-label">👤 Paciente:</span>
-                <span>{info_paciente['paciente']}</span>
+                <span class="info-value">{info_paciente['paciente']}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">📍 Ubicación:</span>
-                <span>{info_paciente['ubicacion']}</span>
+                <span class="info-value">{info_paciente['ubicacion']}</span>
             </div>
         </div>
         
@@ -372,9 +420,7 @@ def crear_html_email_bootstrap(alertas, info_paciente):
                         <div class="fecha-revision">
                             📅 <strong>Revisión:</strong> {alerta['fecha'].strftime('%d/%m/%Y')}
                         </div>
-                        <div>
-                            <span class="badge-dias badge-hoy">⏰ HOY - Acción Inmediata</span>
-                        </div>
+                        <span class="badge-dias badge-hoy">⏰ HOY - Acción Inmediata</span>
                     </div>
                 </div>
             """
@@ -395,9 +441,7 @@ def crear_html_email_bootstrap(alertas, info_paciente):
                         <div class="fecha-revision">
                             📅 <strong>Revisión:</strong> {alerta['fecha'].strftime('%d/%m/%Y')}
                         </div>
-                        <div>
-                            <span class="badge-dias badge-manana">⏰ 1 día restante</span>
-                        </div>
+                        <span class="badge-dias badge-manana">⏰ 1 día restante</span>
                     </div>
                 </div>
             """
@@ -418,9 +462,7 @@ def crear_html_email_bootstrap(alertas, info_paciente):
                         <div class="fecha-revision">
                             📅 <strong>Revisión:</strong> {alerta['fecha'].strftime('%d/%m/%Y')}
                         </div>
-                        <div>
-                            <span class="badge-dias badge-proxima">⏰ {alerta['dias_restantes']} días restantes</span>
-                        </div>
+                        <span class="badge-dias badge-proxima">⏰ {alerta['dias_restantes']} días restantes</span>
                     </div>
                 </div>
             """
