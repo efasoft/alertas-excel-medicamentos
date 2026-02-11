@@ -1,1 +1,52 @@
+name: Alertas de Medicamentos - Sistema Personalizado
 
+on:
+  schedule:
+    # Ejecutar todos los días a las 08:30 UTC
+    # Ajusta según tu zona horaria
+    - cron: '30 7 * * *'
+  
+  # Permite ejecutar manualmente desde la interfaz de GitHub
+  workflow_dispatch:
+
+jobs:
+  enviar-alertas:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+    
+    - name: Configurar Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install openpyxl gdown requests pillow
+    
+    - name: Descargar Excel desde Google Drive
+      env:
+        GDRIVE_FILE_ID: ${{ secrets.GDRIVE_FILE_ID_ALERTAS }}
+      run: |
+        echo "Descargando archivo Excel de alertas desde Google Drive..."
+        gdown --id $GDRIVE_FILE_ID -O medicamentos_alertas.xlsx
+        echo "Archivo descargado exitosamente"
+        ls -lh medicamentos_alertas.xlsx
+    
+    - name: Ejecutar sistema de alertas
+      env:
+        GMAIL_USUARIO: ${{ secrets.GMAIL_USUARIO }}
+        GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+        EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+        WHATSAPP_API_KEY: ${{ secrets.WHATSAPP_API_KEY }}
+      run: |
+        echo "Ejecutando sistema de alertas de medicamentos..."
+        python alerta_medicamentos.py
+    
+    - name: Resultado
+      if: always()
+      run: |
+        echo "Proceso completado - Revisa los logs arriba"
