@@ -187,29 +187,37 @@ def crear_html_email_personalizado(alertas, info_paciente):
             width: 120px; 
             height: 120px; 
             border-radius: 50%; 
-            background: white;
+            background: #e0e0e0;
             overflow: hidden;
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255,255,255,0.5);
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: #666;
         }}
         .card-paciente .foto img {{ 
             width: 100%; 
             height: 100%; 
             object-fit: cover; 
+            display: block;
         }}
         .card-paciente .info {{ 
             flex: 1;
         }}
         .card-paciente .label {{ 
-            font-size: 1.1rem; 
+            font-size: 1.3rem; 
             font-weight: bold; 
-            color: #d4ff00;
-            margin-bottom: 8px;
+            color: #ffeb3b;
+            margin-bottom: 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }}
         .card-paciente .valor {{ 
             font-size: 1.8rem; 
             font-weight: bold; 
+            color: white;
         }}
         
         /* Tarjeta del responsable (azul) */
@@ -225,18 +233,22 @@ def crear_html_email_personalizado(alertas, info_paciente):
             box-shadow: 0 8px 25px rgba(30, 90, 142, 0.3);
         }}
         .card-responsable .label {{ 
-            font-size: 1.1rem; 
+            font-size: 1.3rem; 
             font-weight: bold; 
             color: #00d4ff;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }}
         .card-responsable .valor {{ 
             font-size: 1.8rem; 
             font-weight: bold; 
+            color: white;
         }}
         .card-responsable .telefono {{ 
             font-size: 1.4rem; 
             margin-top: 5px;
+            color: white;
         }}
         
         /* Banner amarillo de advertencia */
@@ -386,9 +398,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         <div class="info-cards">
             <!-- Tarjeta verde del paciente -->
             <div class="card-paciente">
-                <div class="foto">
-                    <img src="https://via.placeholder.com/120/3a7d52/ffffff?text=Paciente" alt="Foto paciente">
-                </div>
+                <div class="foto">👤</div>
                 <div class="info">
                     <div class="label">PACIENTE</div>
                     <div class="valor">{info_paciente['paciente']}</div>
