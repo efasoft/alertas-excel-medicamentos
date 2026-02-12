@@ -222,29 +222,22 @@ def crear_html_email_personalizado(alertas, info_paciente):
         /* Contenedor de tarjetas apiladas */
         .info-cards {{ 
             padding: 50px 40px;
-            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            background: #f8f9fa;
             display: flex;
             flex-direction: column;
             gap: 30px;
         }}
         
-        /* Tarjeta del paciente (glassmorphism verde-esmeralda) */
+        /* Tarjeta del paciente (verde esmeralda sólido) */
         .card-paciente {{ 
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: #059669;
             color: white;
             border-radius: 25px;
             padding: 40px;
             display: flex;
             align-items: center;
             gap: 35px;
-            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }}
-        .card-paciente:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 20px 45px rgba(16, 185, 129, 0.5);
+            box-shadow: 0 15px 35px rgba(5, 150, 105, 0.3);
         }}
         .card-paciente .foto {{ 
             width: 140px; 
@@ -252,7 +245,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             border-radius: 50%; 
             background: white;
             overflow: hidden;
-            border: 5px solid rgba(255, 255, 255, 0.8);
+            border: 5px solid rgba(255, 255, 255, 0.5);
             flex-shrink: 0;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }}
@@ -267,9 +260,9 @@ def crear_html_email_personalizado(alertas, info_paciente):
         }}
         .card-paciente .label {{ 
             font-family: 'Montserrat', sans-serif;
-            font-size: 1rem; 
+            font-size: 0.95rem; 
             font-weight: 700; 
-            color: #fef08a;
+            color: #fde047;
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 3px;
@@ -278,27 +271,20 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Montserrat', sans-serif;
             font-size: 2.2rem; 
             font-weight: 700; 
-            color: white;
+            color: #ffffff;
             line-height: 1.2;
         }}
         
-        /* Tarjeta del responsable (glassmorphism azul-índigo) */
+        /* Tarjeta del responsable (azul índigo sólido) */
         .card-responsable {{ 
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(99, 102, 241, 0.95));
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: #4f46e5;
             color: white;
             border-radius: 25px;
             padding: 40px;
             display: flex;
             flex-direction: column;
             gap: 20px;
-            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }}
-        .card-responsable:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 20px 45px rgba(79, 70, 229, 0.5);
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);
         }}
         .card-responsable .seccion {{
             display: flex;
@@ -307,7 +293,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         }}
         .card-responsable .label {{ 
             font-family: 'Montserrat', sans-serif;
-            font-size: 1rem; 
+            font-size: 0.95rem; 
             font-weight: 700; 
             color: #93c5fd;
             text-transform: uppercase;
@@ -317,14 +303,14 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Montserrat', sans-serif;
             font-size: 2rem; 
             font-weight: 700; 
-            color: white;
+            color: #ffffff;
             line-height: 1.2;
         }}
         .card-responsable .telefono {{ 
             font-family: 'Raleway', sans-serif;
             font-size: 1.5rem; 
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.95);
+            color: #ffffff;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -332,7 +318,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         
         /* Banner amarillo de advertencia */
         .alert-banner {{ 
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            background: #fbbf24;
             color: #1f2937;
             padding: 35px 45px;
             margin: 0 40px 40px 40px;
@@ -340,11 +326,11 @@ def crear_html_email_personalizado(alertas, info_paciente):
             display: flex;
             align-items: center;
             gap: 30px;
-            box-shadow: 0 12px 30px rgba(251, 191, 36, 0.4);
+            box-shadow: 0 12px 30px rgba(251, 191, 36, 0.3);
         }}
         .alert-banner .icon {{ 
             font-size: 5rem;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
         }}
         .alert-banner .texto {{ 
             flex: 1;
@@ -354,6 +340,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             line-height: 1.5;
             text-transform: uppercase;
             letter-spacing: 1px;
+            color: #1f2937;
         }}
         
         /* Container de medicamentos */
@@ -369,17 +356,12 @@ def crear_html_email_personalizado(alertas, info_paciente):
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             overflow: hidden;
             display: flex;
-            transition: all 0.3s ease;
             border: 1px solid rgba(0,0,0,0.05);
-        }}
-        .medicamento-card:hover {{
-            transform: translateY(-8px);
-            box-shadow: 0 20px 45px rgba(0,0,0,0.15);
         }}
         
         /* Calendario lateral (rojo-carmesí) */
         .calendario {{ 
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: #dc2626;
             color: white;
             width: 160px;
             padding: 25px;
@@ -396,6 +378,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-weight: 700; 
             margin-bottom: 8px;
             letter-spacing: 2px;
+            color: #ffffff;
         }}
         .calendario .dia {{ 
             font-family: 'Montserrat', sans-serif;
@@ -403,12 +386,14 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-weight: 800; 
             line-height: 1;
             margin-bottom: 8px;
+            color: #ffffff;
         }}
         .calendario .mes {{ 
             font-family: 'Montserrat', sans-serif;
             font-size: 1.3rem; 
             font-weight: 700; 
             letter-spacing: 2px;
+            color: #ffffff;
         }}
         
         /* Contenido del medicamento */
@@ -438,7 +423,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: #f97316;
             color: white;
             padding: 14px 28px;
             border-radius: 50px;
@@ -451,7 +436,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         
         /* Footer */
         .footer {{ 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background: #1e293b;
             color: white;
             padding: 40px;
             text-align: center;
@@ -465,17 +450,20 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Raleway', sans-serif;
             font-size: 1rem;
             font-weight: 400;
+            color: #ffffff;
         }}
         .footer-info div {{
             display: flex;
             align-items: center;
             gap: 8px;
+            color: #ffffff;
         }}
         .footer p {{
             font-family: 'Raleway', sans-serif;
             font-size: 0.9rem;
             opacity: 0.7;
             font-weight: 300;
+            color: #ffffff;
         }}
         
         /* Responsive */
