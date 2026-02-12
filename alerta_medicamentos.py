@@ -203,17 +203,17 @@ def crear_html_email_personalizado(alertas, info_paciente):
         
         /* Header con imagen de píldoras */
         .header {{ 
-            background: linear-gradient(rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)), 
-                        url('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200') center/cover;
+            background: #667eea;
             color: white; 
-            padding: 70px 40px; 
+            padding: 50px 40px; 
             text-align: center; 
             position: relative;
         }}
         .header h1 {{ 
             font-family: 'Montserrat', sans-serif;
-            font-size: 2.8rem; 
+            font-size: 2.5rem; 
             font-weight: 800; 
+            color: #ffffff;
             text-shadow: 0 4px 12px rgba(0,0,0,0.3);
             letter-spacing: 3px;
             text-transform: uppercase;
@@ -225,7 +225,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             background: #f8f9fa;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 50px;
         }}
         
         /* Tarjeta del paciente (verde esmeralda sólido) */
@@ -236,6 +236,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             padding: 40px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 35px;
             box-shadow: 0 15px 35px rgba(5, 150, 105, 0.3);
         }}
@@ -248,6 +249,9 @@ def crear_html_email_personalizado(alertas, info_paciente):
             border: 5px solid rgba(255, 255, 255, 0.5);
             flex-shrink: 0;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }}
         .card-paciente .foto img {{ 
             width: 100%; 
@@ -257,6 +261,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         }}
         .card-paciente .info {{ 
             flex: 1;
+            text-align: center;
         }}
         .card-paciente .label {{ 
             font-family: 'Montserrat', sans-serif;
@@ -283,6 +288,9 @@ def crear_html_email_personalizado(alertas, info_paciente):
             padding: 40px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
             gap: 20px;
             box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);
         }}
@@ -313,6 +321,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             color: #ffffff;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }}
         
@@ -420,18 +429,17 @@ def crear_html_email_personalizado(alertas, info_paciente):
         
         /* Badge de días restantes */
         .badge-dias {{ 
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            display: inline-block;
             background: #f97316;
             color: white;
-            padding: 14px 28px;
+            padding: 10px 20px;
             border-radius: 50px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.15rem;
+            font-size: 0.95rem;
             font-weight: 700;
             margin-top: 12px;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            text-align: center;
         }}
         
         /* Footer */
@@ -469,22 +477,40 @@ def crear_html_email_personalizado(alertas, info_paciente):
         /* Responsive */
         @media (max-width: 768px) {{
             body {{ padding: 15px; }}
-            .header {{ padding: 50px 25px; }}
-            .header h1 {{ font-size: 2rem; }}
-            .info-cards {{ padding: 30px 20px; gap: 20px; }}
-            .card-paciente, .card-responsable {{ padding: 25px; }}
+            .header {{ padding: 35px 20px; }}
+            .header h1 {{ font-size: 1.6rem; letter-spacing: 1px; }}
+            .info-cards {{ padding: 30px 20px; gap: 25px; }}
+            .card-paciente, .card-responsable {{ 
+                padding: 25px; 
+                flex-direction: column;
+            }}
             .card-paciente .foto {{ width: 100px; height: 100px; }}
+            .card-paciente .label {{ font-size: 0.75rem; }}
+            .card-paciente .valor {{ font-size: 1.5rem; }}
+            .card-responsable .label {{ font-size: 0.75rem; }}
+            .card-responsable .valor {{ font-size: 1.4rem; }}
+            .card-responsable .telefono {{ font-size: 1.1rem; }}
             .alert-banner {{ 
                 flex-direction: column; 
                 margin: 0 20px 30px 20px;
                 padding: 25px;
                 text-align: center;
             }}
-            .alert-banner .icon {{ font-size: 3.5rem; }}
-            .alert-banner .texto {{ font-size: 1.2rem; }}
+            .alert-banner .icon {{ font-size: 3rem; }}
+            .alert-banner .texto {{ font-size: 1rem; letter-spacing: 0.5px; }}
             .medicamentos-container {{ padding: 0 20px 30px 20px; }}
-            .medicamento-card {{ flex-direction: column; }}
-            .calendario {{ width: 100%; padding: 20px; }}
+            .medicamento-card {{ flex-direction: column; margin-bottom: 20px; }}
+            .calendario {{ width: 100%; padding: 15px; }}
+            .calendario .dia-semana {{ font-size: 0.9rem; }}
+            .calendario .dia {{ font-size: 3rem; }}
+            .calendario .mes {{ font-size: 1rem; }}
+            .medicamento-contenido {{ padding: 20px; }}
+            .medicamento-nombre {{ font-size: 1.4rem; }}
+            .medicamento-uso {{ font-size: 0.9rem; }}
+            .badge-dias {{ font-size: 0.85rem; padding: 8px 16px; }}
+            .footer {{ padding: 25px 20px; }}
+            .footer-info {{ font-size: 0.85rem; gap: 20px; }}
+            .footer p {{ font-size: 0.8rem; }}
         }}
     </style>
 </head>
@@ -538,7 +564,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         dia_semana = dias_es[fecha.weekday()]
         dia = fecha.day
         mes = meses_es[fecha.month]
-        dias_texto = f"⏱️ Quedan {alerta['dias_restantes']:02d} días" if alerta['dias_restantes'] > 0 else "🚨 VENCE HOY"
+        dias_texto = f"Quedan {alerta['dias_restantes']:02d} días" if alerta['dias_restantes'] > 0 else "VENCE HOY"
         
         html += f"""
             <div class="medicamento-card">
