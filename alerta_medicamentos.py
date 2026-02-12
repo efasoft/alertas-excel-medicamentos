@@ -334,7 +334,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Raleway', sans-serif;
             font-size: 2rem; 
             font-weight: 700;
-            color: #ffffff !important;
+            color: #ffffff;
             text-align: center;
         }}
         
