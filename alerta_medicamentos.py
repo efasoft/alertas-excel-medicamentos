@@ -210,6 +210,16 @@ def crear_html_email_personalizado(alertas, info_paciente):
             padding: 30px 20px;
             min-height: 100vh;
         }}
+        
+        /* Eliminar formato de enlaces en teléfonos */
+        a[href^="tel"] {{
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }}
+        a {{
+            color: inherit;
+            text-decoration: none;
+        }}
         .container {{ 
             max-width: 1000px; 
             margin: 0 auto; 
@@ -319,7 +329,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Montserrat', sans-serif;
             font-size: 0.95rem; 
             font-weight: 700; 
-            color: #ffffff;
+            color: #93c5fd;
             text-transform: uppercase;
             letter-spacing: 3px;
         }}
@@ -334,8 +344,12 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Raleway', sans-serif;
             font-size: 2rem; 
             font-weight: 700;
-            color: #ffffff;
+            color: #ffffff !important;
             text-align: center;
+        }}
+        .card-responsable .telefono a {{
+            color: #ffffff !important;
+            text-decoration: none !important;
         }}
         
         /* Banner amarillo de advertencia */
@@ -492,6 +506,14 @@ def crear_html_email_personalizado(alertas, info_paciente):
             opacity: 0.7;
             font-weight: 300;
             color: #ffffff;
+        }}
+        .footer a {{
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }}
+        .footer-info a {{
+            color: #ffffff !important;
+            text-decoration: none !important;
         }}
         
         /* Responsive */
