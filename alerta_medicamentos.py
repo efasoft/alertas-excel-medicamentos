@@ -225,7 +225,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             background: #f8f9fa;
             display: flex;
             flex-direction: column;
-            gap: 50px;
+            gap: 60px;
         }}
         
         /* Tarjeta del paciente (verde esmeralda sólido) */
@@ -333,16 +333,18 @@ def crear_html_email_personalizado(alertas, info_paciente):
             margin: 0 40px 40px 40px;
             border-radius: 25px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 30px;
+            justify-content: center;
+            text-align: center;
+            gap: 15px;
             box-shadow: 0 12px 30px rgba(251, 191, 36, 0.3);
         }}
         .alert-banner .icon {{ 
-            font-size: 5rem;
+            font-size: 4rem;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
         }}
         .alert-banner .texto {{ 
-            flex: 1;
             font-family: 'Montserrat', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
@@ -440,6 +442,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             margin-top: 12px;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
             text-align: center;
+            text-transform: uppercase;
         }}
         
         /* Footer */
@@ -452,18 +455,15 @@ def crear_html_email_personalizado(alertas, info_paciente):
         .footer-info {{ 
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 30px;
             margin-bottom: 20px;
             flex-wrap: wrap;
             font-family: 'Raleway', sans-serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 400;
             color: #ffffff;
         }}
         .footer-info div {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
             color: #ffffff;
         }}
         .footer p {{
@@ -491,12 +491,12 @@ def crear_html_email_personalizado(alertas, info_paciente):
             .card-responsable .valor {{ font-size: 1.4rem; }}
             .card-responsable .telefono {{ font-size: 1.1rem; }}
             .alert-banner {{ 
-                flex-direction: column; 
                 margin: 0 20px 30px 20px;
                 padding: 25px;
                 text-align: center;
+                gap: 10px;
             }}
-            .alert-banner .icon {{ font-size: 3rem; }}
+            .alert-banner .icon {{ font-size: 2.5rem; }}
             .alert-banner .texto {{ font-size: 1rem; letter-spacing: 0.5px; }}
             .medicamentos-container {{ padding: 0 20px 30px 20px; }}
             .medicamento-card {{ flex-direction: column; margin-bottom: 20px; }}
@@ -590,9 +590,9 @@ def crear_html_email_personalizado(alertas, info_paciente):
         <!-- Footer -->
         <div class="footer">
             <div class="footer-info">
-                <div>📅 Revisión: {fecha_revision}</div>
-                <div>🤖 Sistema Automatizado</div>
-                <div>☁️ GitHub Actions</div>
+                <div>Revisión: {fecha_revision}</div>
+                <div>Sistema Automatizado</div>
+                <div>Desarrollado por: Ernesto Fernandez +34 611131467</div>
             </div>
             <p style="margin-top: 20px;">
                 Este correo fue generado automáticamente por el sistema de alertas de medicamentos
