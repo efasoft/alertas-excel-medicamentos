@@ -44,13 +44,27 @@ def extraer_imagen_paciente(ruta_excel):
         workbook = openpyxl.load_workbook(ruta_excel)
         sheet = workbook.active
         
+        log("Buscando imagen del paciente en el Excel...")
+        
         # Buscar imágenes en la hoja
-        for image in sheet._images:
-            # La imagen del paciente debería estar en la zona K-L (columnas 11-12)
+        if not hasattr(sheet, '_images'):
+            log("No se encontró el atributo _images en la hoja")
+            workbook.close()
+            return None
+            
+        imagenes = sheet._images
+        log(f"Total de imágenes encontradas: {len(imagenes)}")
+        
+        for idx, image in enumerate(imagenes, 1):
+            # La imagen del paciente debería estar en la zona L-M (columnas 11-12-13)
             if hasattr(image, 'anchor') and hasattr(image.anchor, '_from'):
                 col = image.anchor._from.col
-                # Si está en las columnas K o L (11 o 12)
-                if 10 <= col <= 12:
+                row = image.anchor._from.row
+                log(f"Imagen #{idx}: Columna {col} ({chr(65 + col) if col < 26 else 'Z+'}), Fila {row}")
+                
+                # Si está en las columnas L o M (11, 12, o 13) y filas 4-12
+                if 11 <= col <= 13 and 4 <= row <= 12:
+                    log(f"✓ Imagen encontrada en la zona esperada!")
                     # Convertir a base64
                     img_data = image._data()
                     img = Image.open(io.BytesIO(img_data))
@@ -64,12 +78,16 @@ def extraer_imagen_paciente(ruta_excel):
                     img_base64 = base64.b64encode(buffered.getvalue()).decode()
                     
                     workbook.close()
+                    log("✓ Imagen del paciente extraída correctamente")
                     return f"data:image/png;base64,{img_base64}"
         
         workbook.close()
+        log("⚠ No se encontró imagen en la zona L-M, filas 5-12")
         return None
     except Exception as e:
-        log(f"No se pudo extraer la imagen del paciente: {e}")
+        log(f"Error al extraer la imagen del paciente: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def leer_info_paciente(sheet):
@@ -316,13 +334,10 @@ def crear_html_email_personalizado(alertas, info_paciente):
         }}
         .card-responsable .telefono {{ 
             font-family: 'Raleway', sans-serif;
-            font-size: 1.5rem; 
+            font-size: 2rem; 
             font-weight: 500;
             color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            text-align: center;
         }}
         
         /* Banner amarillo de advertencia */
@@ -489,7 +504,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             .card-paciente .valor {{ font-size: 1.5rem; }}
             .card-responsable .label {{ font-size: 0.75rem; }}
             .card-responsable .valor {{ font-size: 1.4rem; }}
-            .card-responsable .telefono {{ font-size: 1.1rem; }}
+            .card-responsable .telefono {{ font-size: 1.4rem; }}
             .alert-banner {{ 
                 margin: 0 20px 30px 20px;
                 padding: 25px;
@@ -541,7 +556,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
                     <div class="valor">{info_paciente['responsable']}</div>
                 </div>
                 <div class="telefono">
-                    📱 {info_paciente['telefono'] or 'Sin teléfono'}
+                    {info_paciente['telefono'] or 'Sin teléfono'}
                 </div>
             </div>
         </div>
