@@ -241,9 +241,6 @@ def crear_html_email_personalizado(alertas, info_paciente):
         .info-cards {{ 
             padding: 50px 40px;
             background: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-            gap: 60px;
         }}
         
         /* Tarjeta del paciente (verde esmeralda sólido) */
@@ -257,6 +254,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             justify-content: center;
             gap: 35px;
             box-shadow: 0 15px 35px rgba(5, 150, 105, 0.3);
+            margin-bottom: 60px;
         }}
         .card-paciente .foto {{ 
             width: 140px; 
@@ -335,8 +333,8 @@ def crear_html_email_personalizado(alertas, info_paciente):
         .card-responsable .telefono {{ 
             font-family: 'Raleway', sans-serif;
             font-size: 2rem; 
-            font-weight: 500;
-            color: #ffffff;
+            font-weight: 700;
+            color: #ffffff !important;
             text-align: center;
         }}
         
@@ -468,18 +466,25 @@ def crear_html_email_personalizado(alertas, info_paciente):
             text-align: center;
         }}
         .footer-info {{ 
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+            display: block;
             margin-bottom: 20px;
-            flex-wrap: wrap;
             font-family: 'Raleway', sans-serif;
             font-size: 0.95rem;
             font-weight: 400;
             color: #ffffff;
+            line-height: 2;
         }}
         .footer-info div {{
             color: #ffffff;
+            display: inline;
+            margin: 0 15px;
+        }}
+        .footer-info div:after {{
+            content: " | ";
+            margin-left: 15px;
+        }}
+        .footer-info div:last-child:after {{
+            content: "";
         }}
         .footer p {{
             font-family: 'Raleway', sans-serif;
@@ -499,12 +504,13 @@ def crear_html_email_personalizado(alertas, info_paciente):
                 padding: 25px; 
                 flex-direction: column;
             }}
+            .card-paciente {{ margin-bottom: 30px; }}
             .card-paciente .foto {{ width: 100px; height: 100px; }}
             .card-paciente .label {{ font-size: 0.75rem; }}
             .card-paciente .valor {{ font-size: 1.5rem; }}
             .card-responsable .label {{ font-size: 0.75rem; }}
-            .card-responsable .valor {{ font-size: 1.4rem; }}
-            .card-responsable .telefono {{ font-size: 1.4rem; }}
+            .card-responsable .valor {{ font-size: 1.4rem; color: #ffffff !important; }}
+            .card-responsable .telefono {{ font-size: 1.4rem; color: #ffffff !important; }}
             .alert-banner {{ 
                 margin: 0 20px 30px 20px;
                 padding: 25px;
@@ -524,7 +530,9 @@ def crear_html_email_personalizado(alertas, info_paciente):
             .medicamento-uso {{ font-size: 0.9rem; }}
             .badge-dias {{ font-size: 0.85rem; padding: 8px 16px; }}
             .footer {{ padding: 25px 20px; }}
-            .footer-info {{ font-size: 0.85rem; gap: 20px; }}
+            .footer-info {{ font-size: 0.85rem; line-height: 2.5; }}
+            .footer-info div {{ display: block; margin: 5px 0; }}
+            .footer-info div:after {{ content: ""; }}
             .footer p {{ font-size: 0.8rem; }}
         }}
     </style>
