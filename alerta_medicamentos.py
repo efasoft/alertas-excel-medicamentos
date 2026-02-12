@@ -319,7 +319,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
             font-family: 'Montserrat', sans-serif;
             font-size: 0.95rem; 
             font-weight: 700; 
-            color: #93c5fd;
+            color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 3px;
         }}
