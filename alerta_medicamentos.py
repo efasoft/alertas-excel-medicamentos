@@ -33,6 +33,45 @@ def log(mensaje):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] {mensaje}")
 
+def extraer_imagen_paciente(ruta_excel):
+    """Extrae la imagen del paciente del Excel y la convierte a base64"""
+    try:
+        from openpyxl.drawing.image import Image as OpenpyxlImage
+        from PIL import Image
+        import io
+        import base64
+        
+        workbook = openpyxl.load_workbook(ruta_excel)
+        sheet = workbook.active
+        
+        # Buscar imágenes en la hoja
+        for image in sheet._images:
+            # La imagen del paciente debería estar en la zona K-L (columnas 11-12)
+            if hasattr(image, 'anchor') and hasattr(image.anchor, '_from'):
+                col = image.anchor._from.col
+                # Si está en las columnas K o L (11 o 12)
+                if 10 <= col <= 12:
+                    # Convertir a base64
+                    img_data = image._data()
+                    img = Image.open(io.BytesIO(img_data))
+                    
+                    # Redimensionar si es muy grande
+                    img.thumbnail((200, 200), Image.Resampling.LANCZOS)
+                    
+                    # Convertir a base64
+                    buffered = io.BytesIO()
+                    img.save(buffered, format="PNG")
+                    img_base64 = base64.b64encode(buffered.getvalue()).decode()
+                    
+                    workbook.close()
+                    return f"data:image/png;base64,{img_base64}"
+        
+        workbook.close()
+        return None
+    except Exception as e:
+        log(f"No se pudo extraer la imagen del paciente: {e}")
+        return None
+
 def leer_info_paciente(sheet):
     """Lee la información del paciente desde las celdas específicas"""
     try:
@@ -66,6 +105,10 @@ def leer_excel_y_buscar_alertas(ruta_archivo):
         info_paciente = leer_info_paciente(sheet)
         log(f"Paciente: {info_paciente['paciente']}")
         log(f"Responsable: {info_paciente['responsable']}")
+        
+        # Extraer imagen del paciente
+        imagen_paciente = extraer_imagen_paciente(ruta_archivo)
+        info_paciente['imagen'] = imagen_paciente
         
         alertas = []
         fecha_hoy = date.today()
@@ -110,7 +153,7 @@ def leer_excel_y_buscar_alertas(ruta_archivo):
         return None, None
 
 def crear_html_email_personalizado(alertas, info_paciente):
-    """Crea email HTML según diseño del PDF proporcionado"""
+    """Crea email HTML con diseño moderno glassmorphism"""
     num_alertas = len(alertas)
     fecha_revision = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     
@@ -124,6 +167,9 @@ def crear_html_email_personalizado(alertas, info_paciente):
         0: 'LUN', 1: 'MAR', 2: 'MIÉ', 3: 'JUE', 4: 'VIE', 5: 'SÁB', 6: 'DOM'
     }
     
+    # Foto del paciente (base64 o placeholder)
+    foto_paciente = info_paciente.get('imagen') or 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="%23e0e0e0" width="200" height="200"/><text x="50%" y="50%" font-size="80" text-anchor="middle" dy=".3em">👤</text></svg>'
+    
     html = f"""
 <!DOCTYPE html>
 <html lang="es">
@@ -131,71 +177,84 @@ def crear_html_email_personalizado(alertas, info_paciente):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Medicamentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        * {{ 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }}
         body {{ 
-            font-family: 'Arial', sans-serif; 
-            background: linear-gradient(135deg, #e0e5ec 0%, #f5f7fa 100%); 
-            padding: 20px; 
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
+            padding: 30px 20px;
+            min-height: 100vh;
         }}
         .container {{ 
-            max-width: 1200px; 
+            max-width: 1000px; 
             margin: 0 auto; 
-            background: #f5f7fa; 
-            border-radius: 20px; 
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px; 
             overflow: hidden; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }}
         
         /* Header con imagen de píldoras */
         .header {{ 
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+            background: linear-gradient(rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)), 
                         url('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200') center/cover;
             color: white; 
-            padding: 80px 30px; 
+            padding: 70px 40px; 
             text-align: center; 
             position: relative;
         }}
         .header h1 {{ 
-            font-size: 3rem; 
-            font-weight: bold; 
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }}
         
-        /* Contenedor de tarjetas de info */
+        /* Contenedor de tarjetas apiladas */
         .info-cards {{ 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 30px; 
-            padding: 40px; 
-            background: #f5f7fa;
+            padding: 50px 40px;
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }}
         
-        /* Tarjeta del paciente (verde) */
+        /* Tarjeta del paciente (glassmorphism verde-esmeralda) */
         .card-paciente {{ 
-            background: linear-gradient(135deg, #2d5f3f 0%, #3a7d52 100%);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 25px;
+            padding: 40px;
             display: flex;
             align-items: center;
-            gap: 25px;
-            box-shadow: 0 8px 25px rgba(45, 95, 63, 0.3);
+            gap: 35px;
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }}
+        .card-paciente:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(16, 185, 129, 0.5);
         }}
         .card-paciente .foto {{ 
-            width: 120px; 
-            height: 120px; 
+            width: 140px; 
+            height: 140px; 
             border-radius: 50%; 
-            background: #e0e0e0;
+            background: white;
             overflow: hidden;
-            border: 4px solid rgba(255,255,255,0.5);
+            border: 5px solid rgba(255, 255, 255, 0.8);
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5rem;
-            color: #666;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }}
         .card-paciente .foto img {{ 
             width: 100%; 
@@ -207,99 +266,123 @@ def crear_html_email_personalizado(alertas, info_paciente):
             flex: 1;
         }}
         .card-paciente .label {{ 
-            font-size: 1.3rem; 
-            font-weight: bold; 
-            color: #ffeb3b;
-            margin-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem; 
+            font-weight: 700; 
+            color: #fef08a;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 3px;
         }}
         .card-paciente .valor {{ 
-            font-size: 1.8rem; 
-            font-weight: bold; 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem; 
+            font-weight: 700; 
             color: white;
+            line-height: 1.2;
         }}
         
-        /* Tarjeta del responsable (azul) */
+        /* Tarjeta del responsable (glassmorphism azul-índigo) */
         .card-responsable {{ 
-            background: linear-gradient(135deg, #1e5a8e 0%, #2874b5 100%);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(99, 102, 241, 0.95));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 25px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 15px;
-            box-shadow: 0 8px 25px rgba(30, 90, 142, 0.3);
+            gap: 20px;
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }}
+        .card-responsable:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(79, 70, 229, 0.5);
+        }}
+        .card-responsable .seccion {{
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }}
         .card-responsable .label {{ 
-            font-size: 1.3rem; 
-            font-weight: bold; 
-            color: #00d4ff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem; 
+            font-weight: 700; 
+            color: #93c5fd;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 3px;
         }}
         .card-responsable .valor {{ 
-            font-size: 1.8rem; 
-            font-weight: bold; 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem; 
+            font-weight: 700; 
             color: white;
+            line-height: 1.2;
         }}
         .card-responsable .telefono {{ 
-            font-size: 1.4rem; 
-            margin-top: 5px;
-            color: white;
+            font-family: 'Raleway', sans-serif;
+            font-size: 1.5rem; 
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }}
         
         /* Banner amarillo de advertencia */
         .alert-banner {{ 
-            background: linear-gradient(135deg, #f4c430 0%, #ffd700 100%);
-            color: #2c2c2c;
-            padding: 35px 40px;
-            margin: 0 40px 30px 40px;
-            border-radius: 20px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1f2937;
+            padding: 35px 45px;
+            margin: 0 40px 40px 40px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
-            gap: 25px;
-            box-shadow: 0 8px 25px rgba(244, 196, 48, 0.3);
+            gap: 30px;
+            box-shadow: 0 12px 30px rgba(251, 191, 36, 0.4);
         }}
         .alert-banner .icon {{ 
             font-size: 5rem;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
         }}
         .alert-banner .texto {{ 
             flex: 1;
-            font-size: 1.6rem;
-            font-weight: bold;
-            line-height: 1.4;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.5;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }}
         
         /* Container de medicamentos */
         .medicamentos-container {{ 
-            padding: 0 40px 40px 40px; 
+            padding: 0 40px 50px 40px; 
         }}
         
         /* Tarjeta de medicamento */
         .medicamento-card {{ 
             background: white;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             overflow: hidden;
             display: flex;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
         }}
         .medicamento-card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.15);
         }}
         
-        /* Calendario lateral (rojo) */
+        /* Calendario lateral (rojo-carmesí) */
         .calendario {{ 
-            background: linear-gradient(135deg, #c41e3a 0%, #e63946 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             color: white;
-            width: 140px;
-            padding: 20px;
+            width: 160px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -308,82 +391,112 @@ def crear_html_email_personalizado(alertas, info_paciente):
             flex-shrink: 0;
         }}
         .calendario .dia-semana {{ 
-            font-size: 1rem; 
-            font-weight: bold; 
-            margin-bottom: 5px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            margin-bottom: 8px;
+            letter-spacing: 2px;
         }}
         .calendario .dia {{ 
-            font-size: 4rem; 
-            font-weight: bold; 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4.5rem; 
+            font-weight: 800; 
             line-height: 1;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }}
         .calendario .mes {{ 
-            font-size: 1.2rem; 
-            font-weight: bold; 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem; 
+            font-weight: 700; 
+            letter-spacing: 2px;
         }}
         
         /* Contenido del medicamento */
         .medicamento-contenido {{ 
             flex: 1;
-            padding: 30px;
+            padding: 35px 40px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
         }}
         .medicamento-nombre {{ 
+            font-family: 'Montserrat', sans-serif;
             font-size: 2rem; 
-            font-weight: bold; 
-            color: #2c2c2c;
+            font-weight: 700; 
+            color: #1f2937;
+            line-height: 1.2;
         }}
         .medicamento-uso {{ 
+            font-family: 'Raleway', sans-serif;
             font-size: 1.1rem; 
-            color: #666;
+            color: #6b7280;
+            font-weight: 400;
         }}
         
         /* Badge de días restantes */
         .badge-dias {{ 
-            display: inline-block;
-            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
-            padding: 12px 25px;
+            padding: 14px 28px;
             border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-top: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }}
         
         /* Footer */
         .footer {{ 
-            background: #2c3e50;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             color: white;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
         }}
         .footer-info {{ 
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin-bottom: 15px;
+            gap: 40px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            font-size: 0.95rem;
+            font-family: 'Raleway', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+        }}
+        .footer-info div {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        .footer p {{
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-weight: 300;
         }}
         
         /* Responsive */
         @media (max-width: 768px) {{
-            body {{ padding: 10px; }}
+            body {{ padding: 15px; }}
+            .header {{ padding: 50px 25px; }}
             .header h1 {{ font-size: 2rem; }}
-            .info-cards {{ grid-template-columns: 1fr; gap: 20px; padding: 20px; }}
+            .info-cards {{ padding: 30px 20px; gap: 20px; }}
+            .card-paciente, .card-responsable {{ padding: 25px; }}
+            .card-paciente .foto {{ width: 100px; height: 100px; }}
             .alert-banner {{ 
                 flex-direction: column; 
-                margin: 0 20px 20px 20px;
+                margin: 0 20px 30px 20px;
+                padding: 25px;
                 text-align: center;
             }}
-            .alert-banner .icon {{ font-size: 3rem; }}
+            .alert-banner .icon {{ font-size: 3.5rem; }}
             .alert-banner .texto {{ font-size: 1.2rem; }}
-            .medicamentos-container {{ padding: 0 20px 20px 20px; }}
+            .medicamentos-container {{ padding: 0 20px 30px 20px; }}
             .medicamento-card {{ flex-direction: column; }}
-            .calendario {{ width: 100%; padding: 15px; }}
+            .calendario {{ width: 100%; padding: 20px; }}
         }}
     </style>
 </head>
@@ -394,11 +507,13 @@ def crear_html_email_personalizado(alertas, info_paciente):
             <h1>CONTROL DE MEDICAMENTOS</h1>
         </div>
         
-        <!-- Tarjetas de información del paciente y responsable -->
+        <!-- Tarjetas apiladas de información -->
         <div class="info-cards">
             <!-- Tarjeta verde del paciente -->
             <div class="card-paciente">
-                <div class="foto">👤</div>
+                <div class="foto">
+                    <img src="{foto_paciente}" alt="Foto paciente">
+                </div>
                 <div class="info">
                     <div class="label">PACIENTE</div>
                     <div class="valor">{info_paciente['paciente']}</div>
@@ -407,11 +522,13 @@ def crear_html_email_personalizado(alertas, info_paciente):
             
             <!-- Tarjeta azul del responsable -->
             <div class="card-responsable">
-                <div>
+                <div class="seccion">
                     <div class="label">RESPONSABLE</div>
                     <div class="valor">{info_paciente['responsable']}</div>
                 </div>
-                <div class="telefono">{info_paciente['telefono'] or 'Sin teléfono'}</div>
+                <div class="telefono">
+                    📱 {info_paciente['telefono'] or 'Sin teléfono'}
+                </div>
             </div>
         </div>
         
@@ -419,7 +536,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         <div class="alert-banner">
             <div class="icon">✋</div>
             <div class="texto">
-                MEDICAMENTOS QUE ESTÁN PRÓXIMOS AGOTARSE Y REQUIEREN ATENCIÓN
+                Medicamentos que están próximos a agotarse y requieren atención
             </div>
         </div>
         
@@ -433,7 +550,7 @@ def crear_html_email_personalizado(alertas, info_paciente):
         dia_semana = dias_es[fecha.weekday()]
         dia = fecha.day
         mes = meses_es[fecha.month]
-        dias_texto = f"Quedan {alerta['dias_restantes']:02d} días" if alerta['dias_restantes'] > 0 else "VENCE HOY"
+        dias_texto = f"⏱️ Quedan {alerta['dias_restantes']:02d} días" if alerta['dias_restantes'] > 0 else "🚨 VENCE HOY"
         
         html += f"""
             <div class="medicamento-card">
@@ -463,8 +580,8 @@ def crear_html_email_personalizado(alertas, info_paciente):
                 <div>🤖 Sistema Automatizado</div>
                 <div>☁️ GitHub Actions</div>
             </div>
-            <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
-                Este correo fue generado automáticamente
+            <p style="margin-top: 20px;">
+                Este correo fue generado automáticamente por el sistema de alertas de medicamentos
             </p>
         </div>
     </div>
