@@ -110,13 +110,19 @@ def leer_excel_y_buscar_alertas(ruta_archivo):
         return None, None
 
 def crear_html_email_personalizado(alertas, info_paciente):
-    """Crea email HTML según diseño del PDF con Font Awesome"""
+    """Crea email HTML según diseño del PDF proporcionado"""
     num_alertas = len(alertas)
     fecha_revision = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     
-    alertas_hoy = [a for a in alertas if a['dias_restantes'] == 0]
-    alertas_manana = [a for a in alertas if a['dias_restantes'] == 1]
-    alertas_proximas = [a for a in alertas if a['dias_restantes'] >= 2]
+    # Diccionarios para traducir meses y días
+    meses_es = {
+        1: 'ENE', 2: 'FEB', 3: 'MAR', 4: 'ABR', 5: 'MAY', 6: 'JUN',
+        7: 'JUL', 8: 'AGO', 9: 'SEP', 10: 'OCT', 11: 'NOV', 12: 'DIC'
+    }
+    
+    dias_es = {
+        0: 'LUN', 1: 'MAR', 2: 'MIÉ', 3: 'JUE', 4: 'VIE', 5: 'SÁB', 6: 'DOM'
+    }
     
     html = f"""
 <!DOCTYPE html>
@@ -124,168 +130,332 @@ def crear_html_email_personalizado(alertas, info_paciente):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Alertas de Medicamentos</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Control de Medicamentos</title>
     <style>
         * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-        body {{ font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }}
-        .container {{ max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }}
-        .header h1 {{ font-size: 2.2rem; margin-bottom: 10px; }}
-        .header p {{ font-size: 1.1rem; opacity: 0.9; }}
-        .info-paciente {{ display: grid; grid-template-columns: 150px 1fr; gap: 30px; padding: 40px; background: linear-gradient(to right, #f8f9fa, white); border-bottom: 3px solid #667eea; }}
-        .foto-placeholder {{ width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }}
-        .datos-paciente {{ display: flex; flex-direction: column; justify-content: center; gap: 15px; }}
-        .dato-item {{ display: flex; align-items: center; gap: 15px; }}
-        .dato-icon {{ width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }}
-        .dato-label {{ font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 3px; }}
-        .dato-valor {{ font-size: 1.2rem; font-weight: bold; color: #212529; }}
-        .alert-banner {{ background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; padding: 30px; text-align: center; }}
-        .alert-banner h2 {{ font-size: 2.5rem; margin-bottom: 10px; }}
-        .alertas-container {{ padding: 40px; }}
-        .seccion {{ margin-bottom: 40px; }}
-        .seccion-titulo {{ font-size: 1.5rem; font-weight: bold; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }}
-        .seccion-hoy .seccion-titulo {{ background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; }}
-        .seccion-manana .seccion-titulo {{ background: linear-gradient(135deg, #ffa502, #ff7f50); color: white; }}
-        .seccion-proximas .seccion-titulo {{ background: linear-gradient(135deg, #ffd93d, #ffc107); color: #000; }}
-        .medicamento-card {{ background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border-left: 6px solid; }}
-        .card-hoy {{ border-color: #ff6b6b; background: linear-gradient(to right, #fff5f5, white); }}
-        .card-manana {{ border-color: #ffa502; background: linear-gradient(to right, #fff8f0, white); }}
-        .card-proxima {{ border-color: #ffd93d; background: linear-gradient(to right, #fffef0, white); }}
-        .medicamento-header {{ display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }}
-        .medicamento-info {{ flex: 1; min-width: 250px; }}
-        .medicamento-nombre {{ font-size: 1.5rem; font-weight: bold; color: #212529; margin-bottom: 8px; }}
-        .medicamento-uso {{ font-size: 1rem; color: #6c757d; }}
-        .badge-urgencia {{ padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; }}
-        .badge-hoy {{ background: #ff6b6b; color: white; }}
-        .badge-manana {{ background: #ffa502; color: white; }}
-        .badge-proxima {{ background: #ffd93d; color: #000; }}
-        .medicamento-footer {{ display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e9ecef; flex-wrap: wrap; gap: 10px; }}
-        .fecha-info {{ display: flex; align-items: center; gap: 8px; color: #495057; font-size: 0.95rem; }}
-        .footer {{ background: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; border-top: 3px solid #e9ecef; }}
-        .footer-info {{ display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; flex-wrap: wrap; }}
-        .footer-item {{ display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }}
+        body {{ 
+            font-family: 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #e0e5ec 0%, #f5f7fa 100%); 
+            padding: 20px; 
+        }}
+        .container {{ 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: #f5f7fa; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
+        }}
+        
+        /* Header con imagen de píldoras */
+        .header {{ 
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                        url('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200') center/cover;
+            color: white; 
+            padding: 80px 30px; 
+            text-align: center; 
+            position: relative;
+        }}
+        .header h1 {{ 
+            font-size: 3rem; 
+            font-weight: bold; 
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }}
+        
+        /* Contenedor de tarjetas de info */
+        .info-cards {{ 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            padding: 40px; 
+            background: #f5f7fa;
+        }}
+        
+        /* Tarjeta del paciente (verde) */
+        .card-paciente {{ 
+            background: linear-gradient(135deg, #2d5f3f 0%, #3a7d52 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 8px 25px rgba(45, 95, 63, 0.3);
+        }}
+        .card-paciente .foto {{ 
+            width: 120px; 
+            height: 120px; 
+            border-radius: 50%; 
+            background: white;
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.3);
+            flex-shrink: 0;
+        }}
+        .card-paciente .foto img {{ 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }}
+        .card-paciente .info {{ 
+            flex: 1;
+        }}
+        .card-paciente .label {{ 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            color: #d4ff00;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }}
+        .card-paciente .valor {{ 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+        }}
+        
+        /* Tarjeta del responsable (azul) */
+        .card-responsable {{ 
+            background: linear-gradient(135deg, #1e5a8e 0%, #2874b5 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 8px 25px rgba(30, 90, 142, 0.3);
+        }}
+        .card-responsable .label {{ 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            color: #00d4ff;
+            text-transform: uppercase;
+        }}
+        .card-responsable .valor {{ 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+        }}
+        .card-responsable .telefono {{ 
+            font-size: 1.4rem; 
+            margin-top: 5px;
+        }}
+        
+        /* Banner amarillo de advertencia */
+        .alert-banner {{ 
+            background: linear-gradient(135deg, #f4c430 0%, #ffd700 100%);
+            color: #2c2c2c;
+            padding: 35px 40px;
+            margin: 0 40px 30px 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 8px 25px rgba(244, 196, 48, 0.3);
+        }}
+        .alert-banner .icon {{ 
+            font-size: 5rem;
+        }}
+        .alert-banner .texto {{ 
+            flex: 1;
+            font-size: 1.6rem;
+            font-weight: bold;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }}
+        
+        /* Container de medicamentos */
+        .medicamentos-container {{ 
+            padding: 0 40px 40px 40px; 
+        }}
+        
+        /* Tarjeta de medicamento */
+        .medicamento-card {{ 
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }}
+        .medicamento-card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }}
+        
+        /* Calendario lateral (rojo) */
+        .calendario {{ 
+            background: linear-gradient(135deg, #c41e3a 0%, #e63946 100%);
+            color: white;
+            width: 140px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-shrink: 0;
+        }}
+        .calendario .dia-semana {{ 
+            font-size: 1rem; 
+            font-weight: bold; 
+            margin-bottom: 5px;
+        }}
+        .calendario .dia {{ 
+            font-size: 4rem; 
+            font-weight: bold; 
+            line-height: 1;
+            margin-bottom: 5px;
+        }}
+        .calendario .mes {{ 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+        }}
+        
+        /* Contenido del medicamento */
+        .medicamento-contenido {{ 
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }}
+        .medicamento-nombre {{ 
+            font-size: 2rem; 
+            font-weight: bold; 
+            color: #2c2c2c;
+        }}
+        .medicamento-uso {{ 
+            font-size: 1.1rem; 
+            color: #666;
+        }}
+        
+        /* Badge de días restantes */
+        .badge-dias {{ 
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }}
+        
+        /* Footer */
+        .footer {{ 
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        .footer-info {{ 
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            font-size: 0.95rem;
+        }}
+        
+        /* Responsive */
         @media (max-width: 768px) {{
             body {{ padding: 10px; }}
-            .header h1 {{ font-size: 1.6rem; }}
-            .info-paciente {{ grid-template-columns: 1fr; gap: 20px; padding: 30px 20px; text-align: center; }}
-            .alertas-container {{ padding: 20px; }}
-            .medicamento-header {{ flex-direction: column; }}
-            .alert-banner h2 {{ font-size: 1.8rem; }}
+            .header h1 {{ font-size: 2rem; }}
+            .info-cards {{ grid-template-columns: 1fr; gap: 20px; padding: 20px; }}
+            .alert-banner {{ 
+                flex-direction: column; 
+                margin: 0 20px 20px 20px;
+                text-align: center;
+            }}
+            .alert-banner .icon {{ font-size: 3rem; }}
+            .alert-banner .texto {{ font-size: 1.2rem; }}
+            .medicamentos-container {{ padding: 0 20px 20px 20px; }}
+            .medicamento-card {{ flex-direction: column; }}
+            .calendario {{ width: 100%; padding: 15px; }}
         }}
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header con imagen de píldoras -->
         <div class="header">
-            <h1><i class="fas fa-hospital"></i> Sistema de Alertas de Medicamentos</h1>
-            <p>Control y Seguimiento Automatizado</p>
+            <h1>CONTROL DE MEDICAMENTOS</h1>
         </div>
         
-        <div class="info-paciente">
-            <div class="foto-placeholder"><i class="fas fa-user-circle"></i></div>
-            <div class="datos-paciente">
-                <div class="dato-item">
-                    <div class="dato-icon"><i class="fas fa-user"></i></div>
-                    <div>
-                        <div class="dato-label">Paciente</div>
-                        <div class="dato-valor">{info_paciente['paciente']}</div>
-                    </div>
+        <!-- Tarjetas de información del paciente y responsable -->
+        <div class="info-cards">
+            <!-- Tarjeta verde del paciente -->
+            <div class="card-paciente">
+                <div class="foto">
+                    <img src="https://via.placeholder.com/120/3a7d52/ffffff?text=Paciente" alt="Foto paciente">
                 </div>
-                <div class="dato-item">
-                    <div class="dato-icon"><i class="fas fa-user-nurse"></i></div>
-                    <div>
-                        <div class="dato-label">Responsable</div>
-                        <div class="dato-valor">{info_paciente['responsable']}</div>
-                    </div>
+                <div class="info">
+                    <div class="label">PACIENTE</div>
+                    <div class="valor">{info_paciente['paciente']}</div>
                 </div>
-                <div class="dato-item">
-                    <div class="dato-icon"><i class="fas fa-phone"></i></div>
-                    <div>
-                        <div class="dato-label">Contacto</div>
-                        <div class="dato-valor">{info_paciente['telefono'] or 'No especificado'}</div>
-                    </div>
+            </div>
+            
+            <!-- Tarjeta azul del responsable -->
+            <div class="card-responsable">
+                <div>
+                    <div class="label">RESPONSABLE</div>
+                    <div class="valor">{info_paciente['responsable']}</div>
                 </div>
+                <div class="telefono">{info_paciente['telefono'] or 'Sin teléfono'}</div>
             </div>
         </div>
         
+        <!-- Banner amarillo de advertencia -->
         <div class="alert-banner">
-            <h2><i class="fas fa-exclamation-triangle"></i> {num_alertas} Medicamentos</h2>
-            <p>Requieren Revisión Inmediata</p>
+            <div class="icon">✋</div>
+            <div class="texto">
+                MEDICAMENTOS QUE ESTÁN PRÓXIMOS AGOTARSE Y REQUIEREN ATENCIÓN
+            </div>
         </div>
         
-        <div class="alertas-container">
-    """
+        <!-- Lista de medicamentos -->
+        <div class="medicamentos-container">
+"""
     
-    if alertas_hoy:
-        html += '<div class="seccion seccion-hoy"><div class="seccion-titulo"><i class="fas fa-exclamation-circle"></i><span>URGENTE - Revisión HOY</span></div>'
-        for alerta in alertas_hoy:
-            html += f"""
-                <div class="medicamento-card card-hoy">
-                    <div class="medicamento-header">
-                        <div class="medicamento-info">
-                            <div class="medicamento-nombre"><i class="fas fa-pills"></i> {alerta['medicamento']}</div>
-                            <div class="medicamento-uso"><i class="fas fa-notes-medical"></i> {alerta['uso']}</div>
-                        </div>
-                        <span class="badge-urgencia badge-hoy"><i class="fas fa-clock"></i> HOY - Acción Inmediata</span>
-                    </div>
-                    <div class="medicamento-footer">
-                        <div class="fecha-info"><i class="fas fa-calendar-alt"></i><strong>Fecha:</strong> {alerta['fecha'].strftime('%d/%m/%Y')}</div>
-                        <div class="fecha-info"><i class="fas fa-hourglass-end"></i><strong>Días:</strong> 0</div>
-                    </div>
+    # Generar tarjetas de medicamentos
+    for alerta in alertas:
+        fecha = alerta['fecha']
+        dia_semana = dias_es[fecha.weekday()]
+        dia = fecha.day
+        mes = meses_es[fecha.month]
+        dias_texto = f"Quedan {alerta['dias_restantes']:02d} días" if alerta['dias_restantes'] > 0 else "VENCE HOY"
+        
+        html += f"""
+            <div class="medicamento-card">
+                <!-- Calendario lateral -->
+                <div class="calendario">
+                    <div class="dia-semana">{dia_semana}</div>
+                    <div class="dia">{dia}</div>
+                    <div class="mes">{mes}</div>
                 </div>
-            """
-        html += "</div>"
-    
-    if alertas_manana:
-        html += '<div class="seccion seccion-manana"><div class="seccion-titulo"><i class="fas fa-bell"></i><span>IMPORTANTE - Revisión MAÑANA</span></div>'
-        for alerta in alertas_manana:
-            html += f"""
-                <div class="medicamento-card card-manana">
-                    <div class="medicamento-header">
-                        <div class="medicamento-info">
-                            <div class="medicamento-nombre"><i class="fas fa-pills"></i> {alerta['medicamento']}</div>
-                            <div class="medicamento-uso"><i class="fas fa-notes-medical"></i> {alerta['uso']}</div>
-                        </div>
-                        <span class="badge-urgencia badge-manana"><i class="fas fa-clock"></i> MAÑANA - 1 día</span>
-                    </div>
-                    <div class="medicamento-footer">
-                        <div class="fecha-info"><i class="fas fa-calendar-alt"></i><strong>Fecha:</strong> {alerta['fecha'].strftime('%d/%m/%Y')}</div>
-                        <div class="fecha-info"><i class="fas fa-hourglass-half"></i><strong>Días:</strong> 1</div>
-                    </div>
+                
+                <!-- Contenido del medicamento -->
+                <div class="medicamento-contenido">
+                    <div class="medicamento-nombre">{alerta['medicamento']}</div>
+                    <div class="medicamento-uso">{alerta['uso']}</div>
+                    <div class="badge-dias">{dias_texto}</div>
                 </div>
-            """
-        html += "</div>"
-    
-    if alertas_proximas:
-        html += '<div class="seccion seccion-proximas"><div class="seccion-titulo"><i class="fas fa-calendar-check"></i><span>PRÓXIMAMENTE - Planificar Revisión</span></div>'
-        for alerta in alertas_proximas:
-            html += f"""
-                <div class="medicamento-card card-proxima">
-                    <div class="medicamento-header">
-                        <div class="medicamento-info">
-                            <div class="medicamento-nombre"><i class="fas fa-pills"></i> {alerta['medicamento']}</div>
-                            <div class="medicamento-uso"><i class="fas fa-notes-medical"></i> {alerta['uso']}</div>
-                        </div>
-                        <span class="badge-urgencia badge-proxima"><i class="fas fa-clock"></i> {alerta['dias_restantes']} días</span>
-                    </div>
-                    <div class="medicamento-footer">
-                        <div class="fecha-info"><i class="fas fa-calendar-alt"></i><strong>Fecha:</strong> {alerta['fecha'].strftime('%d/%m/%Y')}</div>
-                        <div class="fecha-info"><i class="fas fa-hourglass-start"></i><strong>Días:</strong> {alerta['dias_restantes']}</div>
-                    </div>
-                </div>
-            """
-        html += "</div>"
+            </div>
+        """
     
     html += f"""
         </div>
+        
+        <!-- Footer -->
         <div class="footer">
             <div class="footer-info">
-                <div class="footer-item"><i class="fas fa-clock"></i><span>Revisión: {fecha_revision}</span></div>
-                <div class="footer-item"><i class="fas fa-robot"></i><span>Sistema Automatizado</span></div>
-                <div class="footer-item"><i class="fas fa-cloud"></i><span>GitHub Actions</span></div>
+                <div>📅 Revisión: {fecha_revision}</div>
+                <div>🤖 Sistema Automatizado</div>
+                <div>☁️ GitHub Actions</div>
             </div>
-            <p style="margin-top: 15px; font-size: 0.85rem;">Este correo fue generado automáticamente</p>
+            <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
+                Este correo fue generado automáticamente
+            </p>
         </div>
     </div>
 </body>
