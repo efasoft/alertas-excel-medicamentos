@@ -22,7 +22,7 @@ EMAIL_DESTINO = os.environ.get('EMAIL_DESTINO')
 WHATSAPP_API_KEY = os.environ.get('WHATSAPP_API_KEY', '')
 
 # Archivo Excel
-RUTA_EXCEL = "medicamentos_alertas.xlsx"
+RUTA_EXCEL = "control_de_medicamentos.xlsx"
 
 # Configuración
 DIAS_ALERTA = 3
