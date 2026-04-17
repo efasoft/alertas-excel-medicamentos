@@ -36,7 +36,7 @@ jobs:
           exit 1
         fi
         if [ ! -f "control_de_medicamentos.xlsx" ]; then
-          echo "ERROR: No se encuentra medicamentos_alertas.xlsx"
+          echo "ERROR: No se encuentra control_de_medicamentos.xlsx"
           exit 1
         fi
         echo "✓ Archivos encontrados"
