@@ -24,7 +24,7 @@ WHATSAPP_API_KEY = os.environ.get('WHATSAPP_API_KEY', '')
 FILE_ID_MEDICAMENTOS = os.environ.get('FILE_ID_MEDICAMENTOS')
 
 # Archivo Excel
-RUTA_EXCEL = "control de medicamentos.xlsx"
+RUTA_EXCEL = "CONTROL DE MEDICAMENTOS.xlsx"
 
 # Configuración
 DIAS_ALERTA = 3
