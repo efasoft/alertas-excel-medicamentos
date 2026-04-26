@@ -14,19 +14,46 @@ from email import encoders
 import os
 import sys
 import requests
+import gdown
 
 # Configuración desde variables de entorno
 GMAIL_USUARIO = os.environ.get('GMAIL_USUARIO')
 GMAIL_PASSWORD = os.environ.get('GMAIL_PASSWORD')
 EMAIL_DESTINO = os.environ.get('EMAIL_DESTINO')
 WHATSAPP_API_KEY = os.environ.get('WHATSAPP_API_KEY', '')
+FILE_ID_MEDICAMENTOS = os.environ.get('FILE_ID_MEDICAMENTOS')
 
 # Archivo Excel
-RUTA_EXCEL = "control_de_medicamentos.xlsx"
+RUTA_EXCEL = "control de medicamentos.xlsx"
 
 # Configuración
 DIAS_ALERTA = 3
 FILA_INICIO = 18
+
+def descargar_desde_drive():
+    """Descarga el archivo Excel desde Google Drive"""
+    try:
+        if not FILE_ID_MEDICAMENTOS:
+            log("ERROR: FILE_ID_MEDICAMENTOS no configurado")
+            return False
+        
+        url = f"https://drive.google.com/uc?id={FILE_ID_MEDICAMENTOS}"
+        log(f"Descargando archivo desde Google Drive...")
+        
+        gdown.download(url, RUTA_EXCEL, quiet=False)
+        
+        if os.path.exists(RUTA_EXCEL):
+            log(f"✓ Archivo descargado: {RUTA_EXCEL}")
+            return True
+        else:
+            log("✗ Error: El archivo no se descargó")
+            return False
+            
+    except Exception as e:
+        log(f"✗ Error al descargar: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 def log(mensaje):
     """Registrar mensajes con timestamp"""
@@ -713,6 +740,15 @@ def main():
     
     if not all([GMAIL_USUARIO, GMAIL_PASSWORD, EMAIL_DESTINO]):
         log("❌ ERROR: Faltan variables de entorno")
+        sys.exit(1)
+        
+    if not FILE_ID_MEDICAMENTOS:
+        log("❌ ERROR: Falta FILE_ID_MEDICAMENTOS")
+        sys.exit(1)
+    
+    # Descargar archivo desde Google Drive
+    if not descargar_desde_drive():
+        log("❌ ERROR: No se pudo descargar el archivo desde Drive")
         sys.exit(1)
     
     if not os.path.exists(RUTA_EXCEL):
