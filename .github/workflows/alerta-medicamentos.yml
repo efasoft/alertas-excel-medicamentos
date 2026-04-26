@@ -25,22 +25,8 @@ jobs:
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
-        pip install openpyxl Pillow requests
-    
-    - name: Verificar archivos
-      run: |
-        echo "Verificando archivos necesarios..."
-        ls -la
-        if [ ! -f "alerta_medicamentos.py" ]; then
-          echo "ERROR: No se encuentra alerta_medicamentos.py"
-          exit 1
-        fi
-        if [ ! -f "CONTROL DE MEDICAMENTOS.xlsx" ]; then
-          echo "ERROR: No se encuentra el archivo que esta buscando CONTROL DE MEDICAMENTOS.xlsx"
-          exit 1
-        fi
-        echo "✓ Archivos encontrados"
-    
+        pip install openpyxl Pillow requests gdown
+      
     - name: Ejecutar script de alertas
       env:
         GMAIL_USUARIO: ${{ secrets.GMAIL_USUARIO }}
