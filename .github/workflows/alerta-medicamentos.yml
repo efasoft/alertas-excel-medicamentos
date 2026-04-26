@@ -35,8 +35,8 @@ jobs:
           echo "ERROR: No se encuentra alerta_medicamentos.py"
           exit 1
         fi
-        if [ ! -f "control de medicamentos.xlsx" ]; then
-          echo "ERROR: No se encuentra control de medicamentos.xlsx"
+        if [ ! -f "CONTROL DE MEDICAMENTOS.xlsx" ]; then
+          echo "ERROR: No se encuentra el archivo que esta buscando CONTROL DE MEDICAMENTOS.xlsx"
           exit 1
         fi
         echo "✓ Archivos encontrados"
