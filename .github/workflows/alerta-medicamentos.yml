@@ -47,6 +47,7 @@ jobs:
         GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
         EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
         WHATSAPP_API_KEY: ${{ secrets.WHATSAPP_API_KEY }}
+        FILE_ID_MEDICAMENTOS: ${{ secrets.FILE_ID_MEDICAMENTOS }}        
       run: |
         echo "Ejecutando sistema de alertas..."
         python alerta_medicamentos.py
